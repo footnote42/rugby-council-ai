@@ -39,7 +39,7 @@ python council.py
 The script will pause at each stage to allow you to manually switch models in LM Studio, as LM Studio can only load one model at a time.
 
 ### Modifying Session Parameters
-Edit `council.py` around line 462 to change session requirements:
+Edit `council.py` around line 513 to change session requirements:
 ```python
 session_params = "60 minutes, U10s, 24 players, 4 coaches, focus on decision making around the breakdown"
 ```
@@ -55,13 +55,14 @@ Edit `config.py` to:
 
 ### Core Components
 
-**council.py** - Main orchestration script (473 lines)
+**council.py** - Main orchestration script (524 lines)
 - `load_coaching_framework()`: Loads the Trojans framework from coaching_framework.md
 - `call_lm_studio(prompt, model_name, temperature)`: Handles all LM Studio API communication
 - `wait_for_model_switch(model_name)`: Pauses execution for manual model switching
 - `stage_1_individual_responses()`: Collects independent session plans from each model
-- `stage_2_peer_review()`: Anonymizes plans and collects peer reviews with rankings
-- `stage_3_chairman_synthesis()`: Chairman model creates final synthesis
+- `truncate_plan_for_review(plan, max_chars)`: Intelligently truncates plans to fit context limits
+- `stage_2_peer_review()`: Anonymizes and truncates plans, collects peer reviews with rankings
+- `stage_3_chairman_synthesis()`: Chairman model creates final synthesis from truncated inputs
 - `save_council_session()`: Saves all outputs to sessions/ directory
 - `run_council(session_params)`: Main entry point orchestrating the full process
 
@@ -93,17 +94,22 @@ The council process is **sequential** and **blocking** by design:
 
 2. **Stage 2**: For each of the 3 models:
    - Script pauses for model switch
+   - Plans are **truncated to ~3000 chars** each to fit context limits
    - Sends all 3 plans from Stage 1 with anonymized labels (Plan A, B, C)
+   - Truncation preserves beginning (objectives) and end (summary) sections
    - Model ranks plans and provides critique
    - Reviews stored in `reviews` dictionary
 
 3. **Stage 3**: Chairman model only:
    - Script pauses for chairman model load
-   - Receives all original plans + all peer reviews
+   - Plans are **truncated to ~2500 chars** each, reviews to ~4000 chars
+   - Receives all original plans + all peer reviews (truncated)
    - Synthesizes final optimized session plan
    - Final plan stored in `final_plan` string
 
 4. **Save**: All outputs written to `sessions/council_session_TIMESTAMP.md`
+   - Note: Saved file contains **full, untruncated** content from all stages
+   - Truncation only affects what models see during review/synthesis
 
 ### LM Studio Integration
 
@@ -115,12 +121,34 @@ The system communicates with LM Studio using the OpenAI-compatible API format:
 
 **Critical constraint**: LM Studio can only run one model at a time, requiring manual model switching between stages. The script uses `wait_for_model_switch()` to pause and provide clear instructions.
 
+### Context Window Management
+
+To prevent exceeding model context limits, the system implements intelligent truncation:
+
+**Truncation Strategy**:
+- `truncate_plan_for_review()` reduces long plans while preserving key information
+- Keeps first 60% and last 20% of content (objectives + summary)
+- Inserts marker: `[... middle sections abbreviated for length ...]`
+
+**Truncation Limits**:
+- Stage 2 (peer review): Each plan truncated to max 3000 characters
+- Stage 3 (synthesis): Plans to 2500 chars, reviews to 4000 chars
+- Original full content always preserved in final output file
+
+**Why This Matters**:
+- Prevents context overflow errors with smaller models
+- Maintains review quality by preserving critical plan sections
+- Allows system to work with models that have limited context windows
+- Full plans are still saved - truncation only affects model inputs
+
 ### Model Configuration
 
-Three models with distinct roles:
-- **Ministral-3-8B-Reasoning**: Analytical coach (default chairman) - step-by-step analysis
-- **Ministral-3-8B-Instruct**: Structured coach - strong framework adherence
-- **GPT-OSS-20B**: Creative coach - larger parameter count, creative solutions
+Three models with distinct roles (actual model names configured in `config.py`):
+- **Analytical Coach** (default chairman): Reasoning model for step-by-step analysis
+- **Structured Coach**: Instruction-following model for strong framework adherence
+- **Creative Coach**: Larger model for creative solutions
+
+**Current config.py models**: mistral-tiny (reasoning), mistral-latest (instruct), gpt-4o (creative)
 
 The framework is loaded once at startup and included in every prompt to ensure consistent context.
 
@@ -174,7 +202,7 @@ rugby-council-ai/
 
 ## Common Modifications
 
-**Change session parameters**: Edit the `session_params` string in `council.py:462`
+**Change session parameters**: Edit the `session_params` string in `council.py:513`
 
 **Change models**: Update `COUNCIL_MODELS` dictionary in `config.py` with exact model names from LM Studio
 
