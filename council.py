@@ -193,12 +193,46 @@ Be specific and practical - this should be a plan a coach can actually use."""
     return responses
 
 
+def truncate_plan_for_review(plan: str, max_chars: int = 3000) -> str:
+    """
+    Intelligently truncates a session plan for review to stay within context limits.
+    
+    This keeps the beginning (objectives, structure) and end (coaching points, summary)
+    while noting that middle sections are abbreviated.
+    
+    Args:
+        plan: The full session plan text
+        max_chars: Maximum characters to keep
+    
+    Returns:
+        Truncated version that preserves key information
+    """
+    if len(plan) <= max_chars:
+        return plan
+    
+    # Keep first 60% and last 20% of the character limit
+    # This preserves objectives at start and summary at end
+    first_section = int(max_chars * 0.6)
+    last_section = int(max_chars * 0.2)
+    
+    truncated = (
+        plan[:first_section] + 
+        f"\n\n[... middle sections abbreviated for length ...]\n\n" +
+        plan[-last_section:]
+    )
+    
+    return truncated
+
+
 def stage_2_peer_review(responses: Dict[str, str], framework: str) -> Dict[str, str]:
     """
     STAGE 2: Each model reviews all the plans (including their own).
     
     The plans are anonymized so models can't play favorites.
     Each model ranks the plans and provides constructive feedback.
+    
+    NOTE: Session plans are truncated to fit within context window limits.
+    This preserves the key structural elements while reducing overall size.
     
     Args:
         responses: Dictionary of model responses from Stage 1
@@ -211,6 +245,7 @@ def stage_2_peer_review(responses: Dict[str, str], framework: str) -> Dict[str, 
     print("STAGE 2: PEER REVIEW")
     print("="*70)
     print("\nEach model will now review all three plans...")
+    print("(Plans are truncated to fit context limits while preserving key info)")
     
     reviews = {}
     
@@ -220,10 +255,18 @@ def stage_2_peer_review(responses: Dict[str, str], framework: str) -> Dict[str, 
     model_keys = list(responses.keys())
     
     # Build the plans section for the review prompt
+    # Truncate each plan to avoid context window issues
     plans_text = ""
     for label, model_key in zip(plan_labels, model_keys):
+        truncated_plan = truncate_plan_for_review(responses[model_key], max_chars=3000)
         plans_text += f"\n{'='*70}\n"
-        plans_text += f"{label}:\n\n{responses[model_key]}\n"
+        plans_text += f"{label}:\n\n{truncated_plan}\n"
+        
+        # Show truncation info
+        original_length = len(responses[model_key])
+        truncated_length = len(truncated_plan)
+        if original_length > truncated_length:
+            print(f"   {label}: truncated from {original_length} to {truncated_length} chars")
     
     # Create the review prompt
     review_prompt = f"""You are reviewing three different rugby session plans for Trojans RFC.
@@ -286,6 +329,8 @@ def stage_3_chairman_synthesis(
     then creates a final session plan that incorporates the best ideas
     and addresses the identified weaknesses.
     
+    NOTE: Plans and reviews may be truncated to fit context window limits.
+    
     Args:
         responses: Original session plans from Stage 1
         reviews: Peer reviews from Stage 2
@@ -301,19 +346,25 @@ def stage_3_chairman_synthesis(
     
     chairman_info = config.COUNCIL_MODELS[config.CHAIRMAN_MODEL]
     print(f"\n🎯 {chairman_info['role']} will now create the final plan...")
+    print("(Content may be truncated to fit context limits)")
     
     # Compile all the information for the chairman
+    # Truncate individual plans to manage context window
     all_plans = ""
     for model_key, response in responses.items():
         model_role = config.COUNCIL_MODELS[model_key]['role']
+        truncated_plan = truncate_plan_for_review(response, max_chars=2500)
         all_plans += f"\n{'='*70}\n"
-        all_plans += f"Plan from {model_role}:\n\n{response}\n"
+        all_plans += f"Plan from {model_role}:\n\n{truncated_plan}\n"
     
+    # Keep reviews at full length since they're typically shorter
     all_reviews = ""
     for model_key, review in reviews.items():
         model_role = config.COUNCIL_MODELS[model_key]['role']
+        # Truncate reviews too if needed, but with a higher limit
+        truncated_review = truncate_plan_for_review(review, max_chars=4000)
         all_reviews += f"\n{'='*70}\n"
-        all_reviews += f"Review from {model_role}:\n\n{review}\n"
+        all_reviews += f"Review from {model_role}:\n\n{truncated_review}\n"
     
     # Create the synthesis prompt
     synthesis_prompt = f"""You are the Chairman of the Trojans RFC coaching council.
