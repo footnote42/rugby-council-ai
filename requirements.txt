@@ -1,0 +1,13 @@
+# Rugby Council AI - Python Dependencies
+#
+# Install these using: pip install -r requirements.txt
+# 
+# These are the only two packages we need for this project:
+
+# Requests: For making HTTP calls to LM Studio's API
+# This is how Python talks to your local models
+requests>=2.31.0
+
+# Python-dotenv: For managing environment variables and configuration
+# Good practice for keeping settings separate from code
+python-dotenv>=1.0.0
