@@ -19,6 +19,7 @@ jspm_packages/
 ########
 __pycache__/
 *.py[cod]
+*.pyc
 *$py.class
 .Python
 env/
@@ -61,6 +62,7 @@ htmlcov/
 .env
 .env.*
 .venv
+sessions/
 env/
 
 # OS generated files
