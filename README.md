@@ -34,11 +34,13 @@ rugby-council-ai/
 ├── config.py                  # Configuration settings
 ├── coaching_framework.md      # Trojans RFC Coaching Framework
 ├── requirements.txt           # Python dependencies
-├── sessions/                  # Output folder (created automatically)
-│   └── council_session_*.md  # Generated session plans
+├── sessions/                  # Output folder (created automatically, git-ignored)
+│   └── council_session_*.md  # Generated session plans (not committed)
 ├── venv/                      # Python virtual environment
 └── README.md                  # This file
 ```
+
+**Note**: The `sessions/` folder is intentionally excluded from git (via `.gitignore`) because it contains generated output files. Each user maintains their own session history locally. This prevents repository bloat and merge conflicts.
 
 ## Setup Instructions
 

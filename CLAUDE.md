@@ -194,11 +194,19 @@ rugby-council-ai/
 ├── config.py                   # Configuration settings
 ├── coaching_framework.md       # Trojans RFC framework (loaded by council.py)
 ├── requirements.txt            # Python dependencies
-├── sessions/                   # Auto-created output directory
-│   └── council_session_*.md   # Generated session plans
-├── venv/                       # Virtual environment (not committed)
+├── sessions/                   # Auto-created output directory (git-ignored)
+│   └── council_session_*.md   # Generated session plans (not committed)
+├── venv/                       # Virtual environment (git-ignored)
 └── README.md                   # User-facing documentation
 ```
+
+**Git-Ignored Directories**:
+- `sessions/` - Contains generated AI outputs; each user maintains their own session history locally
+- `venv/` and `.venv/` - Python virtual environments
+- `__pycache__/` - Python bytecode cache
+- `.claude/` - Claude Code configuration
+
+These directories are excluded from version control because they contain either generated artifacts, environment-specific files, or user-specific data.
 
 ## Common Modifications
 
