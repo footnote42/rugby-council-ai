@@ -78,7 +78,7 @@ def call_lm_studio(prompt: str, model_name: str, temperature: float = 0.7) -> st
         response = requests.post(
             f"{config.LM_STUDIO_BASE_URL}/chat/completions",
             json=payload,
-            timeout=300  # Wait up to 5 minutes for a response
+            timeout=600  # Wait up to 10 minutes for a response
         )
         
         # Check if the request was successful

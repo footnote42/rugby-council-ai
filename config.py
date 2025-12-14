@@ -30,8 +30,8 @@ COUNCIL_MODELS = {
         "role": "Structured Coach"
     },
     "gpt": {
-        "name": "gpt-oss-20b",
-        "description": "Larger general model - good for creative solutions",
+        "name": "Qwen3-8b",
+        "description": "Alternative reasoning model - good for diverse perspectives",
         "role": "Creative Coach"
     }
 }
