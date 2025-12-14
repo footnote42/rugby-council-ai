@@ -20,17 +20,17 @@ LM_STUDIO_BASE_URL = "http://localhost:1234/v1"
 
 COUNCIL_MODELS = {
     "reasoning": {
-        "name": "mistral-tiny",
+        "name": "mistral-3-8b-reasoning",
         "description": "Reasoning model - good for step-by-step analysis",
         "role": "Analytical Coach"
     },
     "instruct": {
-        "name": "mistral-latest", 
+        "name": "mistral-3-8b", 
         "description": "Instruction-following model - good for structured responses",
         "role": "Structured Coach"
     },
     "gpt": {
-        "name": "gpt-4o",
+        "name": "gpt-oss-20b",
         "description": "Larger general model - good for creative solutions",
         "role": "Creative Coach"
     }
