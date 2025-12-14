@@ -11,3 +11,7 @@ requests>=2.31.0
 # Python-dotenv: For managing environment variables and configuration
 # Good practice for keeping settings separate from code
 python-dotenv>=1.0.0
+
+# Testing
+# Pytest for running unit tests
+pytest>=7.0.0

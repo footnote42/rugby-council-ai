@@ -244,6 +244,6 @@ This project is for educational and personal use with Trojans RFC.
 ---
 
 **Project**: Systematic AI Delegation  
-**Author**: Wayne  
-**Date**: December 2024  
+**Author**: Wayne Ellis
+**Date**: December 2025  
 **Purpose**: Exploring multi-model collaboration for rugby coaching
