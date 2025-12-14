@@ -182,22 +182,47 @@ If a plan doesn't address these elements, it will be critiqued in peer review an
 
 ## Dependencies
 
-Only two external packages (see requirements.txt):
+Three external packages (see requirements.txt):
 - `requests>=2.31.0` - HTTP calls to LM Studio API
 - `python-dotenv>=1.0.0` - Environment variable management (included for good practice, not currently used)
+- `pytest>=7.0.0` - Testing framework for unit tests
 
 ## Directory Structure
 
 ```
 rugby-council-ai/
-├── council.py                  # Main orchestration script
-├── config.py                   # Configuration settings
-├── coaching_framework.md       # Trojans RFC framework (loaded by council.py)
-├── requirements.txt            # Python dependencies
-├── sessions/                   # Auto-created output directory (git-ignored)
-│   └── council_session_*.md   # Generated session plans (not committed)
-├── venv/                       # Virtual environment (git-ignored)
-└── README.md                   # User-facing documentation
+├── council.py                     # Main orchestration script
+├── config.py                      # Configuration settings
+├── coaching_framework.md          # Trojans RFC framework (loaded by council.py)
+├── requirements.txt               # Python dependencies
+├── CLAUDE.md                      # AI assistant guidance (this file)
+├── OBSIDIAN_TEMPLATE.md          # Template for Obsidian note-taking
+├── README.md                      # User-facing documentation
+├── docs/                          # Documentation
+│   ├── architecture.md           # System architecture documentation
+│   ├── case-studies/             # Real-world usage examples
+│   │   └── first-successful-session.md
+│   ├── guides/                   # How-to guides
+│   │   ├── getting-started.md
+│   │   ├── configuration.md
+│   │   └── troubleshooting.md
+│   └── research/                 # Research notes and findings
+│       ├── methodology.md
+│       ├── findings.md
+│       └── comparison-studies.md
+├── examples/                      # Example configurations and outputs
+│   ├── config-presets/           # Pre-configured council setups
+│   │   ├── creative-council.py
+│   │   └── systematic-council.py
+│   ├── prompts/                  # Example prompts
+│   │   └── README.md
+│   └── session-outputs/          # Example generated sessions
+│       └── u10-breakdown-decision.md
+├── tests/                         # Unit tests
+│   └── test_council.py           # Tests for council.py
+├── sessions/                      # Auto-created output directory (git-ignored)
+│   └── council_session_*.md      # Generated session plans (not committed)
+└── venv/                          # Virtual environment (git-ignored)
 ```
 
 **Git-Ignored Directories**:

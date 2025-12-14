@@ -42,6 +42,22 @@ rugby-council-ai/
 
 **Note**: The `sessions/` folder is intentionally excluded from git (via `.gitignore`) because it contains generated output files. Each user maintains their own session history locally. This prevents repository bloat and merge conflicts.
 
+## Documentation
+
+### Getting Started
+- [Installation Guide](docs/guides/getting-started.md)
+- [Troubleshooting](docs/guides/troubleshooting.md)
+
+### Case Studies
+- [First Successful Session](docs/case-studies/first-successful-session.md) - Complete walkthrough of the council process with analysis
+
+### Examples
+- [U10 Breakdown Session](examples/session-outputs/u10-breakdown-decision.md) - Example output showing council capabilities
+
+### Research
+- [Methodology](docs/research/methodology.md)
+- [Findings](docs/research/findings.md)
+
 ## Setup Instructions
 
 ### 1. LM Studio Setup
