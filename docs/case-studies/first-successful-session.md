@@ -1,6 +1,6 @@
 # Case Study: First Successful Council Session
 
-**Date**: December 14, 2024  
+**Date**: 14 December 2025  
 **Session Focus**: U10 Decision Making Around the Breakdown  
 **Models**: Ministral-3-8B-Reasoning, Ministral-3-8B-Instruct, Qwen2.5-8B-Instruct  
 **Total Processing Time**: 45 minutes  
