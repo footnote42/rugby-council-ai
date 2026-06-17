@@ -1,265 +1,209 @@
 # Rugby Council AI
 
-An AI-powered coaching council that collaboratively designs rugby training sessions based on the Trojans RFC Coaching Framework.
+A multi-agent AI system that orchestrates a "council" of local language models to collaboratively design rugby training sessions. Three models independently produce plans, critique each other's work anonymously, then a designated chairman synthesises everything into a final output — all running locally, with no data leaving the machine.
 
-## What This Does
-
-Instead of asking a single AI model to design a session, this system creates a "council" of three different AI models that work together through a three-stage process:
-
-**Stage 1 - Individual Plans**: Each model independently creates a complete session plan based on your parameters and the Trojans Coaching Framework.
-
-**Stage 2 - Peer Review**: The models then review and critique all three plans (anonymously) and rank them based on how well they follow the framework.
-
-**Stage 3 - Chairman Synthesis**: A designated "chairman" model reviews all the plans and all the critiques, then creates a final optimized session plan that incorporates the best ideas.
-
-This approach produces better results than a single model because it combines multiple perspectives and includes a critical review process.
-
-## Models Used
-
-This project uses three local models running in LM Studio. The default configuration uses:
-
-- **Analytical Coach**: Reasoning model for step-by-step analysis
-- **Structured Coach**: Instruction-following model for framework adherence
-- **Creative Coach**: Larger model for innovative solutions
-
-The analytical model acts as chairman by default, synthesizing all input into the final plan.
-
-**Note**: The actual model names are configured in `config.py`. Make sure the model names in the config file match exactly what you have loaded in LM Studio.
-
-## Project Structure
-
-```
-rugby-council-ai/
-├── council.py                 # Main orchestration script
-├── config.py                  # Configuration settings
-├── coaching_framework.md      # Trojans RFC Coaching Framework
-├── requirements.txt           # Python dependencies
-├── sessions/                  # Output folder (created automatically, git-ignored)
-│   └── council_session_*.md  # Generated session plans (not committed)
-├── venv/                      # Python virtual environment
-└── README.md                  # This file
-```
-
-**Note**: The `sessions/` folder is intentionally excluded from git (via `.gitignore`) because it contains generated output files. Each user maintains their own session history locally. This prevents repository bloat and merge conflicts.
-
-## Documentation
-
-### Getting Started
-- [Installation Guide](docs/guides/getting-started.md)
-- [Troubleshooting](docs/guides/troubleshooting.md)
-
-### Case Studies
-- [First Successful Session](docs/case-studies/first-successful-session.md) - Complete walkthrough of the council process with analysis
-
-### Examples
-- [U10 Breakdown Session](examples/session-outputs/u10-breakdown-decision.md) - Example output showing council capabilities
-
-### Research
-- [Methodology](docs/research/methodology.md)
-- [Findings](docs/research/findings.md)
-
-## Setup Instructions
-
-### 1. LM Studio Setup
-
-First, make sure LM Studio is installed and configured:
-
-1. **Download models** (if you haven't already):
-   - Open LM Studio
-   - Download the models you want to use (check `config.py` for current configuration)
-   - Example models that work well:
-     - Any Mistral-based reasoning or instruct models
-     - Larger models like GPT variants for creative thinking
-     - Ensure model names in `config.py` match exactly what appears in LM Studio
-
-2. **Start the local server**:
-   - Click "Local Server" in the left sidebar
-   - Click "Start Server"
-   - Verify it shows `Running on http://localhost:1234`
-   - Keep LM Studio open while running the council
-
-**Important**: LM Studio can only run one model at a time. The script will pause between stages to let you switch models. This is normal and expected.
-
-### 2. Python Environment Setup
-
-Open VS Code with your project folder, then open the integrated terminal (Control + backtick).
-
-1. **Create virtual environment**:
-   ```bash
-   python -m venv venv
-   ```
-
-2. **Activate virtual environment**:
-   
-   On Windows:
-   ```bash
-   venv\Scripts\activate
-   ```
-   
-   On Mac/Linux:
-   ```bash
-   source venv/bin/activate
-   ```
-   
-   You should see `(venv)` appear in your terminal prompt.
-
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## How to Run the Council
-
-### Basic Usage
-
-1. **Make sure LM Studio server is running** (see Setup above)
-
-2. **In VS Code terminal, activate your virtual environment** if it's not already active
-
-3. **Run the council**:
-   ```bash
-   python council.py
-   ```
-
-4. **Follow the prompts**:
-   - The script will tell you which model to load in LM Studio
-   - Switch to LM Studio, load the requested model
-   - Return to terminal and press Enter
-   - Repeat for each stage
-
-### Customizing Session Parameters
-
-To request a different type of session, edit the session parameters in `council.py`:
-
-```python
-# Near the bottom of council.py, around line 513
-session_params = "60 minutes, U10s, 24 players, 4 coaches, focus on decision making around the breakdown"
-```
-
-Change this to whatever you need, for example:
-- `"45 minutes, U8s, 16 players, 3 coaches, focus on passing and catching"`
-- `"90 minutes, U12s, 30 players, 5 coaches, focus on defensive organization"`
-
-### Configuring Models
-
-To change which models are used or which model acts as chairman, edit `config.py`:
-
-```python
-# Change the chairman model
-CHAIRMAN_MODEL = "reasoning"  # Can be "reasoning", "instruct", or "gpt"
-
-# Adjust creativity level (0.0 = focused, 1.0 = creative)
-TEMPERATURE = 0.7
-```
-
-## What to Expect During Execution
-
-When you run the council, here's what happens:
-
-1. **Initialization**: The script loads your coaching framework and parameters
-
-2. **Stage 1**: For each model (about 5-10 minutes per model):
-   - Script tells you which model to load
-   - You switch models in LM Studio
-   - Press Enter in terminal
-   - Model generates a session plan
-   - You see a preview of the response
-
-3. **Stage 2**: Same process, but models are reviewing plans (3-5 minutes per model)
-
-4. **Stage 3**: Chairman model creates final synthesis (5-10 minutes)
-
-5. **Completion**: All outputs are saved to `sessions/council_session_TIMESTAMP.md`
-
-**Total time**: Expect 30-45 minutes for a complete council session.
-
-## Understanding the Output
-
-The output file contains everything that happened during the council meeting:
-
-### Individual Plans (Stage 1)
-Each model's original session plan. Compare these to see how different models interpret the same framework and parameters.
-
-### Peer Reviews (Stage 2)
-Each model's critique of all three plans, including rankings. This is fascinating because you see what each model values in a good session plan.
-
-### Final Plan (Stage 3)
-The chairman's synthesized plan that combines the best elements. This is your ready-to-use session plan.
-
-## Tips for Best Results
-
-**Be specific with parameters**: Instead of "focus on skills", say "focus on passing under pressure and decision making at the breakdown". The more specific you are, the better the models can design to your needs.
-
-**Review the individual plans**: Don't just jump to the final plan. Reading the individual responses and reviews gives you insights into different coaching approaches.
-
-**Experiment with different chairmen**: Try running the same session request with different models as chairman. You'll see how each model synthesizes information differently.
-
-**Compare with your own planning**: Use this as a coaching development tool. How does the council's approach compare to how you'd plan the session? What did they think of that you didn't?
-
-## Troubleshooting
-
-**"Cannot connect to LM Studio"**
-- Make sure LM Studio is running
-- Check that the server is started (should show green "Running" status)
-- Verify it's on port 1234 (the default)
-
-**"Request timed out"**
-- The model is taking too long (>5 minutes)
-- This can happen with very complex requests
-- Try simplifying your session parameters
-- Or try a smaller model
-
-**"Wrong model loaded" responses**
-- Make sure you're loading the exact model the script requests
-- The model names in `config.py` must match LM Studio exactly
-- Check for typos in model names
-
-**Models giving generic responses**
-- Check that `coaching_framework.md` exists in your project folder
-- Make sure the framework file wasn't corrupted
-- Try increasing `MAX_TOKENS` in `config.py` if responses seem cut off
-
-**Script crashes with Python errors**
-- Make sure you activated the virtual environment (`venv`)
-- Check that you installed requirements: `pip install -r requirements.txt`
-- Verify you're using Python 3.8 or newer: `python --version`
-
-## Next Steps and Experiments
-
-Once you have the basic council working, try these experiments:
-
-**Test different council compositions**: What happens if you use three of the same model? Or two instruct models and one reasoning model?
-
-**Vary the temperature**: Lower temperature (0.3-0.5) gives more consistent results. Higher temperature (0.8-0.9) gives more creative variety.
-
-**Add more models**: If you download additional models to LM Studio, add them to `config.py` and expand your council.
-
-**Different session types**: Try having the council plan pre-season fitness sessions vs. in-season tactical sessions vs. tournament preparation.
-
-**Compare to your own plans**: Ask the council to plan a session you've already run, then compare approaches.
-
-## Technical Notes for Future Development
-
-This project uses a simple, synchronous approach where each API call blocks until complete. This makes the code easy to understand but means sessions take significant time.
-
-Possible improvements:
-- Add async/await for concurrent model calls (though LM Studio still processes one at a time)
-- Implement a queueing system for model switches
-- Add a web interface for easier interaction
-- Store sessions in a database for analysis over time
-- Add visualization of how reviews influenced the final plan
-
-## Contributing
-
-This is a personal learning project, but if you're interested in rugby coaching with AI, feel free to fork and experiment.
-
-## License
-
-This project is for educational and personal use with Trojans RFC.
+Built as a practical experiment in agentic AI orchestration using the [Trojans RFC Coaching Framework](coaching_framework.md) as the domain knowledge layer.
 
 ---
 
-**Project**: Systematic AI Delegation  
-**Author**: Wayne Ellis
-**Date**: December 2025  
-**Purpose**: Exploring multi-model collaboration for rugby coaching
+## What problem this solves
+
+Asking a single AI model to design a session produces one perspective. It cannot critique its own blind spots or notice when it has skimped on a framework requirement. This system applies a structured debate-and-synthesis pattern across three models with distinct personas, producing a final plan that is more complete and framework-compliant than any individual model achieves alone.
+
+The practical result: a ready-to-use coaching session plan that explicitly addresses every element of the club's coaching framework — five coaching habits, TREDS values, APES principles, age-appropriate safety notes, and STEP progressions with concrete measurements.
+
+---
+
+## Architecture
+
+The system runs through three sequential stages, orchestrated by `council.py`:
+
+```
+Session parameters + Coaching Framework
+              │
+              ▼
+┌─────────────────────────────────┐
+│  STAGE 1: Independent Planning  │
+│                                 │
+│  Analytical Coach  ─────────┐  │
+│  Structured Coach  ─────────┤  │
+│  Creative Coach    ─────────┘  │
+│  (no cross-visibility)         │
+└──────────────┬──────────────────┘
+               │ Three session plans
+               ▼
+┌─────────────────────────────────┐
+│  STAGE 2: Anonymous Peer Review │
+│                                 │
+│  Plans labelled A / B / C       │
+│  (author identity removed)      │
+│                                 │
+│  Each model reviews all three,  │
+│  ranks them, identifies gaps    │
+└──────────────┬──────────────────┘
+               │ Three sets of critiques
+               ▼
+┌─────────────────────────────────┐
+│  STAGE 3: Chairman Synthesis    │
+│                                 │
+│  Receives all plans + reviews   │
+│  Combines best elements         │
+│  Addresses identified weaknesses│
+│  Produces final session plan    │
+└──────────────┬──────────────────┘
+               │
+               ▼
+     sessions/council_session_[timestamp].md
+```
+
+`council.py` calls LM Studio's local REST API (OpenAI-compatible `/v1/chat/completions`) for each model call. Because LM Studio loads one model at a time on consumer hardware, the script pauses between model calls and prompts the operator to switch models manually. This makes the system accessible without requiring multiple GPUs or cloud API keys.
+
+Long session plans are intelligently truncated before passing to Stage 2 and Stage 3 — preserving the first 60% (objectives, structure) and last 20% (coaching points, summary) of each plan. This keeps the council functional on 8B models with limited context windows.
+
+---
+
+## Why local model hosting
+
+All inference runs through LM Studio on local hardware. No prompts, no session data, and no domain knowledge leave the machine.
+
+This matters in any context where the content being processed is sensitive — coaching data, organisational frameworks, operational knowledge. Running locally eliminates the network dependency, removes third-party data handling considerations, and keeps the operator in full control of what models are used and when they are updated.
+
+The tradeoff is inference speed (8B models at 6–15 tokens/sec on consumer hardware) and manual model switching. For a use case like session planning — where you run the council once and use the output — this is an acceptable cost.
+
+---
+
+## Models used
+
+Tested configuration (December 2025):
+
+| Role | Model | Characteristics |
+|------|-------|-----------------|
+| Analytical Coach | `Ministral-3-8B-Reasoning` | Step-by-step reasoning, explicit framework mapping |
+| Structured Coach | `Ministral-3-8B-Instruct` | Clean output formatting, practical implementation detail |
+| Creative Coach | `Qwen2.5-8B-Instruct` | Player-centred ideas, engagement focus, novel activities |
+| **Chairman** | `Ministral-3-8B-Reasoning` | Synthesises all input |
+
+Models are configured in `config.py`. Any LM Studio-compatible models can be substituted — the model names must match exactly what appears in LM Studio's interface.
+
+---
+
+## What the council produces
+
+From the [first successful session](docs/case-studies/first-successful-session.md) (U10 breakdown decision-making, December 2025):
+
+The three models produced genuinely different plans. Peer review identified real gaps: missing safety notes, vague STEP progressions, unlinked coaching habit references. The chairman's synthesised plan addressed every identified weakness and drew activities from all three individual plans — not simply selecting the highest-ranked plan.
+
+**Total processing time**: 45 minutes on a 16GB consumer laptop
+
+Full example output: [U10 Breakdown Decision Making](examples/session-outputs/u10-breakdown-decision.md)
+
+---
+
+## Setup
+
+### Prerequisites
+
+- [LM Studio](https://lmstudio.ai/) installed with models downloaded
+- Python 3.8+
+
+### 1. Start LM Studio server
+
+Open LM Studio → Local Server → Start Server. Verify it shows `Running on http://localhost:1234`.
+
+### 2. Python environment
+
+```bash
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# Mac/Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### 3. Configure models
+
+Edit `config.py` to match the model names as they appear in your LM Studio:
+
+```python
+COUNCIL_MODELS = {
+    "reasoning": {
+        "name": "mistral-3-8b-reasoning",   # Must match LM Studio exactly
+        "role": "Analytical Coach"
+    },
+    "instruct": {
+        "name": "mistral-3-8b",
+        "role": "Structured Coach"
+    },
+    "gpt": {
+        "name": "Qwen3-8b",
+        "role": "Creative Coach"
+    }
+}
+
+CHAIRMAN_MODEL = "reasoning"
+TEMPERATURE = 0.7
+MAX_TOKENS = 2000
+```
+
+---
+
+## Running the council
+
+```bash
+python council.py
+```
+
+The script pauses between model calls and prompts you to switch models in LM Studio. Total operator interactions: 7 model switches. Total elapsed time: 30–45 minutes on 8B models.
+
+### Session parameters
+
+Edit near the bottom of `council.py`:
+
+```python
+session_params = "60 minutes, U10s, 24 players, 4 coaches, focus on decision making around the breakdown"
+```
+
+---
+
+## Project structure
+
+```
+rugby-council-ai/
+├── council.py                        # Main orchestration script
+├── config.py                         # Model roster and settings
+├── coaching_framework.md             # Trojans RFC framework (domain knowledge)
+├── requirements.txt
+├── sessions/                         # Generated outputs (gitignored, local only)
+├── examples/
+│   └── session-outputs/
+│       └── u10-breakdown-decision.md
+└── docs/
+    ├── case-studies/
+    │   └── first-successful-session.md
+    ├── guides/
+    │   ├── getting-started.md
+    │   └── troubleshooting.md
+    └── research/
+        ├── methodology.md
+        └── findings.md
+```
+
+---
+
+## Extending the system
+
+The council pattern is domain-agnostic. Replacing `coaching_framework.md` with any structured domain knowledge document and adjusting the prompts in `council.py` adapts this to policy analysis, code review, lesson planning, or any other domain where multi-perspective critique adds value before synthesis.
+
+---
+
+## Hardware notes
+
+Tested on a 16GB RAM laptop. 8B parameter models require approximately 5–6GB of RAM each. If you have a GPU, LM Studio will use it automatically and inference speed improves significantly. The 600-second API timeout accommodates CPU-only inference.
+
+---
+
+Author: Wayne Ellis — December 2025
